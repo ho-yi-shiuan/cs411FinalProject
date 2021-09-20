@@ -1,4 +1,4 @@
-# vue-js-client-crud
+# my-project
 
 ## Project setup
 ```
