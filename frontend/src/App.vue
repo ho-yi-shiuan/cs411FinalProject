@@ -1,60 +1,70 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
+    <v-footer
       dark
+      padless
+      class="brown lighten-3"
     >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
+      <v-card
+        class="flex brown lighten-3"
+        flat
+        tile
       >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
+        <v-card-title class="brown darken-2">
+          <img src="../public/cat-face.png" style="height:30px" /><strong class="subheading" style="margin-left:5px">Where's Brownie?</strong>
+          <v-spacer></v-spacer>
 
-    <v-main>
-      <HelloWorld/>
-    </v-main>
+          <v-btn
+            v-for="icon in icons"
+            :key="icon"
+            :to="iconLink"
+            class="mx-4"
+            dark
+            icon
+          >
+            <v-icon size="30px" style="margin:0;">
+              {{ icon }}
+            </v-icon>
+          </v-btn>
+        </v-card-title>
+      </v-card>
+    </v-footer>
+    <router-view/>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+//import MainPage from './components/mainpage/MainPage.vue';
+import {
+  mdiAccount,
+  mdiPlusCircleOutline ,
+  mdiHome
+} from '@mdi/js'
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+    //MainPage,
   },
 
-  data: () => ({
-    //
-  }),
+    data: () => ({
+      icons: [
+        mdiHome ,
+        mdiPlusCircleOutline ,
+        mdiAccount,
+      ],
+      link: [
+        "/",
+        "/upload",
+        "/profile"
+      ]
+    }),
 };
 </script>
+
+<style>
+#app {
+  background: #FFF3E0;
+}
+</style>

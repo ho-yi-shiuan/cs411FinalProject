@@ -4,13 +4,15 @@ import App from './App.vue'
 import routes from './router/routes'
 import vuetify from './plugins/vuetify'
 
-Vue.config.productionTip = false
+Vue.use(VueRouter)
 
+Vue.config.productionTip = false
 
 // configure router
 const router = new VueRouter({
   mode: 'history',
-  routes // short for routes: routes
+  routes, // short for routes: routes
+  duplicateNavigationPolicy: 'reload'
 });
 
 new Vue({
