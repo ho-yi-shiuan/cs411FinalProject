@@ -1,9 +1,5 @@
 <template>
-  <v-card
-    :loading="loading"
-    class="mx-auto my-12"
-    width="70%"
-  >
+  <BackgroundCard>
     <validation-observer
       ref="observer"
       v-slot="{ invalid }"
@@ -102,12 +98,13 @@
         </v-row>
       </v-form>
     </validation-observer>
-  </v-card>
+  </BackgroundCard>
 </template>
 
 <script>
   import { required, digits, email, max, regex } from 'vee-validate/dist/rules'
   import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+  import BackgroundCard from '../card/BackgroundCard.vue'
 
   setInteractionMode('eager')
 
@@ -141,6 +138,7 @@
     components: {
       ValidationProvider,
       ValidationObserver,
+      BackgroundCard
     },
     data: () => ({
       name: '',

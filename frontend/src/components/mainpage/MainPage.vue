@@ -1,7 +1,5 @@
 <template>
-  <v-card
-    class="mx-auto MainBackground"
-  >
+  <BackgroundCard>
     <SearchBar style="width: 100%;"/>
     <v-container style="padding:0px 12px;">
       <v-row dense class="d-flex flex-row justify-space-between">
@@ -36,14 +34,16 @@
         </v-card>
       </v-row>
     </v-container>
-  </v-card>
+  </BackgroundCard>
 </template>
 <script>
 import SearchBar from "./SearchBar.vue"
+import BackgroundCard from '../card/BackgroundCard.vue'
 export default {
     name: 'MainPage',
     components: {
         SearchBar,
+        BackgroundCard
     },
     data: () => ({
       items: [
@@ -76,12 +76,6 @@ export default {
 }
 </script>
 <style>
-.MainBackground {
-    background-color:rgba（255,255,255,0.2);
-    margin: 20px 0px;
-    padding: 20px 40px 10px 40px;
-    width: 70%;
-}
 .MainPageCard {
     width: 30%;
     margin: 20px 5px;

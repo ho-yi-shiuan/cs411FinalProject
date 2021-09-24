@@ -16,14 +16,14 @@
 
           <v-btn
             v-for="icon in icons"
-            :key="icon"
-            :to="iconLink"
+            :key="icon.icon"
+            :to="icon.path"
             class="mx-4"
             dark
             icon
           >
             <v-icon size="30px" style="margin:0;">
-              {{ icon }}
+              {{ icon.icon }}
             </v-icon>
           </v-btn>
         </v-card-title>
@@ -50,14 +50,9 @@ export default {
 
     data: () => ({
       icons: [
-        mdiHome ,
-        mdiPlusCircleOutline ,
-        mdiAccount,
-      ],
-      link: [
-        "/",
-        "/upload",
-        "/profile"
+        {icon: mdiHome, path: '/'},
+        {icon: mdiPlusCircleOutline, path: '/upload'},
+        {icon: mdiAccount, path: '/profile'}
       ]
     }),
 };

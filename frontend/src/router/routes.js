@@ -1,5 +1,6 @@
 import MainPage from '../components/mainpage/MainPage.vue'
 import upload from '../components/upload/upload.vue'
+import UserProfilePage from '../components/userProfile/ProfilePage.vue'
 
 const router = [
   {
@@ -11,7 +12,12 @@ const router = [
     path: '/upload',
     name: 'upload',
     component: upload
-  }
+  },
+  {
+    path: '/profile',
+    name: 'UserProfilePage',
+    component: UserProfilePage
+  },
 ]
 
 export default router;
