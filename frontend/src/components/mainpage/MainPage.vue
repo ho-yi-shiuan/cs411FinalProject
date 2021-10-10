@@ -4,31 +4,33 @@
     <v-container style="padding:0px 12px;">
       <v-row dense class="d-flex flex-row justify-space-between">
         <v-card
-            v-for="(item, i) in items"
-            :key="i"
+            v-for="item in items"
+            :key=item.petID
             cols="12"
             class="MainPageCard"
         >
             <div class="d-flex" style="padding: 10px;">
                 <div style="width:100%">
-                    <v-img :src="item.src" class="MainPageItemImage"></v-img>
-                    <v-card-title
-                        class="text-h5"
-                        v-text="item.title"
-                    ></v-card-title>
+                  <div class="imgContainer">
+                    <v-img :src="item.picture" class="MainPageItemImage"></v-img>
+                  </div>
+                  <v-card-title
+                      class="text-h5"
+                      v-text="item.color"
+                  ></v-card-title>
 
-                    <v-card-subtitle v-text="item.artist"></v-card-subtitle>
+                  <v-card-subtitle v-text="item.size"></v-card-subtitle>
 
-                    <v-card-actions>
-                        <v-btn
-                        class="ml-2 mt-5"
-                        outlined
-                        rounded
-                        small
-                        >
-                        See more
-                        </v-btn>
-                    </v-card-actions>
+                  <v-card-actions>
+                      <v-btn
+                      class="ml-2 mt-5"
+                      outlined
+                      rounded
+                      small
+                      >
+                      See more
+                      </v-btn>
+                  </v-card-actions>
                 </div>
             </div>
         </v-card>
@@ -39,40 +41,28 @@
 <script>
 import SearchBar from "./SearchBar.vue"
 import BackgroundCard from '../card/BackgroundCard.vue'
+import {apiGetPet} from "../../requests/api"
+
 export default {
     name: 'MainPage',
     components: {
         SearchBar,
         BackgroundCard
     },
-    data: () => ({
-      items: [
-        {
-          color: '#1F7087',
-          src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
-          title: 'breed',
-          artist: 'size',
-        },
-        {
-          color: '#952175',
-          src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
-          title: 'breed',
-          artist: 'size',
-        },
-        {
-          color: '#1F7087',
-          src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
-          title: 'breed',
-          artist: 'size',
-        },
-        {
-          color: '#952175',
-          src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
-          title: 'breed',
-          artist: 'size',
-        }
-      ]
-    })
+    data() {
+      return {
+        items:[]
+      }
+    },
+    mounted() {
+      apiGetPet()
+        .then(res => {
+          this.items = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });    
+    }
 }
 </script>
 <style>
@@ -80,10 +70,20 @@ export default {
     width: 30%;
     margin: 20px 5px;
 }
+
+.imgContainer{
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  position: relative;
+}
+
 .MainPageItemImage {
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
+  position: absolute;
+  object-fit: cover;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
