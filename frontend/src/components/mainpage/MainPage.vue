@@ -1,6 +1,6 @@
 <template>
   <BackgroundCard>
-    <SearchBar style="width: 100%;"/>
+    <SearchBar v-on:search="ShowSearchResult" style="width: 100%;"/>
     <v-container style="padding:0px 12px;">
       <v-row dense class="d-flex flex-row justify-space-between">
         <v-card
@@ -18,9 +18,8 @@
                       class="text-h5"
                       v-text="item.color"
                   ></v-card-title>
-
                   <v-card-subtitle v-text="item.size"></v-card-subtitle>
-
+                  <v-card-subtitle v-text="item.city + ', ' +item.state"></v-card-subtitle>
                   <v-card-actions>
                       <v-btn
                       class="ml-2 mt-5"
@@ -62,6 +61,11 @@ export default {
         .catch(err => {
           console.log(err);
         });    
+    },
+    methods: {
+      ShowSearchResult: function ShowSearchResult(pet){
+        this.items = pet;
+      }
     }
 }
 </script>

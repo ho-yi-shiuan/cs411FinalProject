@@ -21,6 +21,7 @@
             v-model="name"
             :error-messages="errors"
             label="Name of pet(if know)"
+            color="lime darken-3"
           ></v-text-field>
         </validation-provider>
         <v-row>
@@ -59,6 +60,7 @@
           <v-menu
             ref="menu"
             v-model="menu"
+            color="lime darken-3"
             :close-on-content-click="false"
             :return-value.sync="date"
             transition="scale-transition"
@@ -70,6 +72,7 @@
                 v-model="date"
                 :error-messages="errors"
                 label="Date of find/lost"
+                color="lime darken-3"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-on="on"
@@ -77,20 +80,21 @@
             </template>
             <v-date-picker
               v-model="date"
+              color="lime darken-3"
               no-title
               scrollable
             >
               <v-spacer></v-spacer>
               <v-btn
                 text
-                color="primary"
+                color="lime darken-3"
                 @click="menu = false"
               >
                 Cancel
               </v-btn>
               <v-btn
                 text
-                color="primary"
+                color="lime darken-3"
                 @click="$refs.menu.save(date)"
               >
                 OK
@@ -107,6 +111,7 @@
             v-model="zipcode"
             :error-messages="errors"
             label="Zipcode (required)"
+            color="lime darken-3"
           ></v-text-field>
         </validation-provider>
         <validation-provider
@@ -117,6 +122,7 @@
             v-model="age"
             :error-messages="errors"
             label="age"
+            color="lime darken-3"
           ></v-text-field>
         </validation-provider>
         <validation-provider
@@ -128,6 +134,8 @@
             :items="healthIssue"
             :error-messages="errors"
             label="Health Issue"
+            color="lime darken-3"
+            item-color="lime darken-3"
             multiple
           ></v-select>
         </validation-provider>
@@ -142,6 +150,8 @@
             :items="sizes"
             :error-messages="errors"
             label="Size (required)"
+            color="lime darken-3"
+            item-color="lime darken-3"
           ></v-select>
         </validation-provider>
         <validation-provider
@@ -154,6 +164,8 @@
             :items="colors"
             :error-messages="errors"
             label="Color (required)"
+            color="lime darken-3"
+            item-color="lime darken-3"
             multiple
           ></v-select>
         </validation-provider>
@@ -166,6 +178,7 @@
           <v-file-input
             accept="image/*"
             label="Upload picture of pet (required)"
+            color="lime darken-3"
             :error-messages="errors"
             v-model="picture"
           ></v-file-input>
@@ -178,6 +191,7 @@
           <v-col><div class="FormSelectTitle">Chipped</div></v-col>
           <v-checkbox
             v-model="checkbox"
+            color="lime darken-3"
             :error-messages="errors"
             value="1"
             type="checkbox"

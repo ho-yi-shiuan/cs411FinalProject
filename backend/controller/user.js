@@ -1,25 +1,36 @@
 const express = require("express");
-//const { presignAssetPost, createAsset} = require("../service/asset");
-const {getUserProfile} = require("../model/user");
+const {getUserProfile, signup, signin} = require("../model/user");
 const userController = express.Router();
 
-userController.get("/user", async (req, res) => {
-    let userID = req.cookies.userID;
-    if(token) {
-      const result = await getUserProfile(userID);
-      if(result.data){
-        res.status(result.code || 200).json(result.data);
-        return;
-      
-      }else{
-        res.status(401).end();
-        return;
+userController.post("/", async (req, res) => {
+  //const token = req.cookies.user;
+  const token = "54dec20e2b0a245534678f32fbce679f3cce85de0352cb322e8c95f7bedf16c4";
+  const result = await getUserProfile(token);
+  res.status(200).json(result.data);
+});
 
-      }
-    }else{
-      res.status(401).end();
-        return;
-    }
+//user signup
+userController.post("/signup", async (req, res) => {
+  const user = req.body;
+  const result = await signup(user);
+  res.cookie("user",data.user.access_token, { 
+    secure: true,
+    httpOnly: true
+    //domain: 'example.com',
+  });
+  res.status(200).json(result.data);
+});
+
+//user signin
+userController.post("/signin", async (req, res) => {
+  const user = req.body;
+  const result = await signin(user);
+  res.cookie("user",result.data.user.access_token, { 
+    secure: true,
+    httpOnly: true
+    //domain: 'example.com',
+  });
+  res.status(200).json(result.data);
 });
 
 

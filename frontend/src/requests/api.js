@@ -14,11 +14,6 @@ const petRequest = axios.create({
     baseURL: "http://localhost:3000/pet"
 });
 
-// search api
-const searchRequest = axios.create({
-    baseURL: "http://localhost:3000/search"
-});
-
 // upload new pet api
 const uploadRequest = axios.create({
     baseURL: "http://localhost:3000/upload"
@@ -30,9 +25,7 @@ export const apiUserLogin = data => userRequest.post('/signin', data);
 // pet api
 export const apiGetPet = () => petRequest.get('/allPets');
 export const apiUploadPet = data => petRequest.post( '/',data,{headers: {'Content-Type': 'multipart/form-data'}});
-
-// search api
-export const apiSearch = data => searchRequest.get(`/search?filter=${data}`);
+export const apiSearchPet = data => petRequest.post('/search',data);
 
 //upload new pet api
 export const apiGetUploadForm = () => uploadRequest.get('/');

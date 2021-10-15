@@ -1,5 +1,5 @@
 const express = require("express");
-const {getPetList, InsertPet} = require("../model/pet");
+const {getPetList, InsertPet, SearchPet} = require("../model/pet");
 const petController = express.Router();
 const app = express();
 const fs = require('fs');
@@ -31,10 +31,18 @@ petController.get("/allPets", async (req, res) => {
 });
 
 //upload form content for new pet
-petController.post("/",upload.single('picture'), async (req, res) => {//
-    const pet = req.body;
-    const result = await InsertPet(pet.userId, pet.status, pet.date, req.file.key, pet.name, pet.breed, pet.category, pet.age, pet.color, pet.size, pet.gender, pet.chip_status, pet.health_issue, pet.zip_code, 0);
-    res.status(200).json(result.data);
+petController.post("/",upload.single('picture'), async (req, res) => {
+  const pet = req.body;
+  const result = await InsertPet(pet.userId, pet.status, pet.date, req.file.key, pet.name, pet.breed, pet.category, pet.age, pet.color, pet.size, pet.gender, pet.chip_status, pet.health_issue, pet.zip_code, 0);
+  res.status(200).json(result.data);
+});
+
+//upload form content for new pet
+petController.post("/search", async (req, res) => {
+  const pet = req.body;
+  console.log(pet);
+  const result = await SearchPet(pet.status, pet.dateStart, pet.dateEnd, pet.breed, pet.category, pet.color, pet.size, pet.gender, pet.checkbox, pet.health_issue, pet.zipcode)
+  res.status(200).json(result.data);
 });
 
 module.exports = petController;

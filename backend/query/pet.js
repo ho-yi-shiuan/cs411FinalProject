@@ -1,5 +1,6 @@
 const AllPets = `
-    SELECT * FROM PET;
+    SELECT * FROM PET
+    LEFT JOIN ZIPCODE ON ZIPCODE.zipCode = PET.zip_code;
 `;
 const findBreed = `
     SELECT bid FROM BREED 

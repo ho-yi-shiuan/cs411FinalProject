@@ -1,62 +1,197 @@
 <template>
     <v-card color="grey lighten-4" flat tile>
-        <v-toolbar dense style="padding: 0px 10px 0px 20px;">
-            <v-text-field v-model="SearchText" hide-details single-line></v-text-field>
-            <v-btn icon>
-                <v-icon>mdi-magnify</v-icon>
-            </v-btn>
-            <v-card-actions>
-                <v-btn icon @click="show = !show">
-                    <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+        <v-form @submit.prevent="submit" ref="form">
+            <v-toolbar dense style="padding: 0px 10px 0px 20px;">
+                <v-text-field v-model="zipcode" color="lime darken-3" label="Search by zipcode" hide-details single-line></v-text-field>
+                <v-btn type="submit" icon>
+                    <v-icon>mdi-magnify</v-icon>
                 </v-btn>
-            </v-card-actions>
-        </v-toolbar>
-        <v-expand-transition>
-            <div v-show="show">
-                <v-container fluid style="padding: 20px 12px;" class="SearchCheckBoxContainer">
-                    <v-row class="ma-0">
-                    <v-col><div class="SelectTitle">Type of post:</div></v-col>
-                    <v-col><v-radio-group mandatory v-model="selectedFormType" row>
-                    <v-radio label="lost" value="lost" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-radio>
-                    <v-radio label="found" value="found" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-radio>
-                    </v-radio-group></v-col>
-                    </v-row>                   
-                    <v-row class="ma-0">
-                    <v-col><div class="SelectTitle">Type:</div></v-col>
-                    <v-col><v-radio-group mandatory v-model="selectedType" row>
-                    <v-radio label="dog" value="dog" @click="dog=true; cat=false;" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-radio>
-                    <v-radio label="cat" value="cat" @click="cat=true; dog=false;" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-radio>
-                    </v-radio-group></v-col>
-                    </v-row>
-                    <v-expand-transition>
-                        <v-row class="ma-0" v-show="dog">
-                            <v-col><div class="SelectTitle">Breed:</div></v-col>
-                            <v-col>
-                            <v-checkbox v-model="selectedBreed" color="lime darken-3" class="SearchBarCheckBox ma-0" v-for="breed in breedDog" :key="breed.value" :label="breed.text" :value="breed.value"></v-checkbox>
-                            </v-col>
+                <v-card-actions>
+                    <v-btn icon @click="show = !show">
+                        <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                    </v-btn>
+                </v-card-actions>
+            </v-toolbar>
+            <v-expand-transition>
+                <div v-show="show">
+                    <v-container fluid style="padding: 20px 12px;" class="SearchCheckBoxContainer">
+                        <v-row class="ma-0">
+                        <v-col><div class="SelectTitle">Type of post:</div></v-col>
+                        <v-col><v-select
+                            v-model="selectedFormType"
+                            color="lime darken-3"
+                            item-color="lime darken-3"
+                            :items="FormType"
+                            label="Type of post"
+                            multiple
+                        ></v-select></v-col>
                         </v-row>
-                    </v-expand-transition>
-                    <v-expand-transition>
-                        <v-row class="ma-0" v-show="cat">
-                            <v-col><div class="SelectTitle">Breed:</div></v-col>
-                            <v-col>
-                            <v-checkbox v-model="selectedBreed" color="lime darken-3" class="SearchBarCheckBox ma-0" v-for="breed in breedCat" :key="breed.value" :label="breed.text" :value="breed.value"></v-checkbox>
-                            </v-col>
+                        <v-row class="ma-0">
+                        <v-col><div class="SelectTitle">Type:</div></v-col>
+                        <v-col><v-checkbox v-model="selectedType" label="dog" @click="dog=true; cat=false;" value="dog" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-checkbox></v-col>
+                        <v-col><v-checkbox v-model="selectedType" label="cat" @click="cat=true; dog=false;" value="cat" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-checkbox></v-col>
                         </v-row>
-                    </v-expand-transition>
+                        <v-expand-transition>
+                            <v-row class="ma-0" v-show="dog">
+                                <v-col><div class="SelectTitle">Breed:</div></v-col>
+                                <v-col>
+                                <v-checkbox v-model="selectedBreed" color="lime darken-3" item-color="lime darken-3" class="SearchBarCheckBox ma-0" v-for="breed in breedDog" :key="breed.value" :label="breed.text" :value="breed.value"></v-checkbox>
+                                </v-col>
+                            </v-row>
+                        </v-expand-transition>
+                        <v-expand-transition>
+                            <v-row class="ma-0" v-show="cat">
+                                <v-col><div class="SelectTitle">Breed:</div></v-col>
+                                <v-col>
+                                <v-checkbox v-model="selectedBreed" color="lime darken-3" class="SearchBarCheckBox ma-0" v-for="breed in breedCat" :key="breed.value" :label="breed.text" :value="breed.value"></v-checkbox>
+                                </v-col>
+                            </v-row>
+                        </v-expand-transition>
+                        <v-row class="ma-0">
+                            <v-col><div class="SelectTitle">Gender:</div></v-col>
+                            <v-col><v-checkbox v-model="selectedGender" label="female" value="female" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-checkbox></v-col>
+                            <v-col><v-checkbox v-model="selectedGender" label="male" value="male" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-checkbox></v-col>
+                        </v-row>
                     <v-row class="ma-0">
-                        <v-col><div class="SelectTitle">Gender:</div></v-col>
-                        <v-col><v-checkbox v-model="selectedGender" label="female" value="female" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-checkbox></v-col>
-                        <v-col><v-checkbox v-model="selectedGender" label="male" value="male" color="lime darken-3" class="SearchBarCheckBox ma-0"></v-checkbox></v-col>
+                        <v-col><div class="SelectTitle">Date:</div></v-col>
+                        <v-col><v-menu
+                            ref="menu"
+                            v-model="menu"
+                            color="lime darken-3"
+                            :close-on-content-click="false"
+                            :return-value.sync="date"
+                            transition="scale-transition"
+                            offset-y
+                            min-width="auto"
+                        >
+                            <template v-slot:activator="{ on }">
+                            <v-text-field
+                                v-model="dateStart"
+                                label="Start date"
+                                color="lime darken-3"
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-on="on"
+                            ></v-text-field>
+                            </template>
+                            <v-date-picker
+                            v-model="dateStart"
+                            color="lime darken-3"
+                            no-title
+                            scrollable
+                            >
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                text
+                                color="lime darken-3"
+                                @click="menu = false"
+                            >
+                                Cancel
+                            </v-btn>
+                            <v-btn
+                                text
+                                color="lime darken-3"
+                                @click="$refs.menu.save(date)"
+                            >
+                                OK
+                            </v-btn>
+                            </v-date-picker>
+                        </v-menu></v-col>
+                        <v-col><v-menu
+                            ref="menu"
+                            v-model="menu"
+                            color="lime darken-3"
+                            :close-on-content-click="false"
+                            :return-value.sync="date"
+                            transition="scale-transition"
+                            offset-y
+                            min-width="auto"
+                        >
+                            <template v-slot:activator="{ on }">
+                            <v-text-field
+                                v-model="dateEnd"
+                                label="End date"
+                                color="lime darken-3"
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-on="on"
+                            ></v-text-field>
+                            </template>
+                            <v-date-picker
+                            v-model="dateEnd"
+                            color="lime darken-3"
+                            no-title
+                            scrollable
+                            >
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                text
+                                color="lime darken-3"
+                                @click="menu = false"
+                            >
+                                Cancel
+                            </v-btn>
+                            <v-btn
+                                text
+                                color="lime darken-3"
+                                @click="$refs.menu.save(date)"
+                            >
+                                OK
+                            </v-btn>
+                            </v-date-picker>
+                        </v-menu></v-col>
                     </v-row>
-                </v-container>
-            </div>
-        </v-expand-transition>
+                    <v-row class="ma-0">
+                        <v-col><div class="SelectTitle">Size:</div></v-col>
+                        <v-col><v-select
+                            v-model="selectSize"
+                            color="lime darken-3"
+                            item-color="lime darken-3"
+                            :items="sizes"
+                            label="Size"
+                            multiple
+                        ></v-select></v-col>                    
+                    </v-row>
+                    <v-row class="ma-0">
+                        <v-col><div class="SelectTitle">Color:</div></v-col>
+                        <v-col><v-select
+                            v-model="selectColor"
+                            :items="colors"
+                            label="Color"
+                            color="lime darken-3"
+                            item-color="lime darken-3"
+                            multiple
+                        ></v-select></v-col>
+                    </v-row>
+                    <v-row class="ma-0">
+                        <v-col><div class="SelectTitle">Chipped</div></v-col>
+                        <v-col><v-select
+                            v-model="selectHealth"
+                            :items="healthIssue"
+                            label="Health Issue"
+                            color="lime darken-3"
+                            item-color="lime darken-3"
+                            multiple
+                        ></v-select></v-col>
+                    </v-row>
+                    <v-row class="ma-0">
+                        <v-col><div class="SelectTitle">Chipped</div></v-col>
+                        <v-col><v-checkbox
+                            v-model="checkbox"
+                            color="lime darken-3"
+                            value="1"
+                            type="checkbox"
+                        ></v-checkbox></v-col>
+                    </v-row>
+                    </v-container>
+                </div>
+            </v-expand-transition>
+        </v-form>
     </v-card>
 </template>
 
 <script>
-    import {apiGetUploadForm} from "../../requests/api"
+    import {apiSearchPet,apiGetUploadForm} from "../../requests/api"
     export default {
         name: 'SearchBar',
         mounted() {
@@ -71,23 +206,55 @@
             });    
         },
         data: () => ({
-        show: false,
-        SearchText: "Search by zip code",
-        selectedFormType: null,
-        selectedType: null,
-        selectedBreed: null,
-        selectGender: null,
-        healthIssue: [],
-        dog: true,
-        cat: false,
-        breedDog:[],
-        breedCat:[],
-        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-        menu: false,
-        sizes: ["small","meduim","large"],
-        colors: ["white","black","brown","orange","grey"],
-        checkbox: null,
+            show: false,
+            zipcode: null,
+            selectedFormType: null,
+            FormType:["lost","found"],
+            selectedType: null,
+            selectedBreed: null,
+            selectedGender: null,
+            healthIssue: [],
+            lost: false,
+            found: false,
+            dog: false,
+            cat: false,
+            breedDog:[],
+            breedCat:[],
+            dateStart: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            dateEnd: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            menu: false,
+            sizes: ["small","meduim","large"],
+            colors: ["white","black","brown","orange","grey"],
+            selectColor: null,
+            selectSize: null,
+            selectHealth: null,
+            checkbox: null,
+            SelectedPet:null,
         }),
+        methods:{
+            submit (){
+                let searchContent = {
+                    "zipcode": this.zipcode,
+                    "status": this.selectedFormType,
+                    "dateStart": this.dateStart,
+                    "dateEnd": this.dateEnd,
+                    "breed": this.selectedBreed,
+                    "category": this.selectedType,
+                    "color": this.selectColor,
+                    "size": this.selectSize,
+                    "gender": this.selectedGender,
+                    "health_issue": this.selectHealth,
+                    "checkbox": this.checkbox
+                }
+                apiSearchPet(searchContent)
+                    .then(res => {
+                    this.$emit("search" ,res.data);
+                    })
+                    .catch(err => {
+                    console.log(err);
+                    });  
+            }
+        }
     }
 </script>
 
