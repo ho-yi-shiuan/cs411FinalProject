@@ -3,6 +3,9 @@ import VueRouter from 'vue-router'
 import App from './App.vue'
 import routes from './router/routes'
 import vuetify from './plugins/vuetify'
+import store from "./plugins/store"
+var VueCookie = require('vue-cookie');
+Vue.use(VueCookie);
 
 Vue.use(VueRouter)
 
@@ -18,5 +21,6 @@ const router = new VueRouter({
 new Vue({
   router,
   vuetify,
+  store,
   render: h => h(App)
 }).$mount('#app')

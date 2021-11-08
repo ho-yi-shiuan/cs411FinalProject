@@ -104,13 +104,13 @@
         </validation-provider>
         <validation-provider
           v-slot="{ errors }"
-          name="zipcode"
+          name="zip_code"
           rules="required"
         >
           <v-text-field
-            v-model="zipcode"
+            v-model="zip_code"
             :error-messages="errors"
-            label="Zipcode (required)"
+            label="zip_code (required)"
             color="lime darken-3"
           ></v-text-field>
         </validation-provider>
@@ -198,16 +198,38 @@
           ></v-checkbox>
           </v-row>
         </validation-provider>
+        <v-row>
+          <v-alert
+            v-show="show"
+            dense
+            border="left"
+            type="warning"
+            style="margin-top:10px; width:100%;"
+          >
+            Error in uploading, please try later
+          </v-alert>
+        </v-row>  
         <v-row justify="center">
-          <v-btn @click="clear" class="formButton">
-            clear
+          <v-btn class="mr-3" color="brown lighten-3" @click="goBack">
+            Cancel
+            <v-icon right>mdi-close-circle-outline</v-icon>
+          </v-btn>
+          <v-btn v-if="status === 'processing'" disabled>
+            Uploading
+            <v-progress-circular class="ml-2" indeterminate size="14" width="2" color="lime"/></v-btn>
+          <v-btn v-else-if="status === 'success'" color="light-green" disabled>
+            Success
+            <v-icon right>mdi-checkbox-marked-circle-outline</v-icon>
           </v-btn>
           <v-btn
+            v-else
             class="mr-4 formButton"
+            color="lime"
             type="submit"
             :disabled="invalid"
           >
-            submit
+            Upload
+            <v-icon right>mdi-checkbox-marked-circle-outline</v-icon>
           </v-btn>
         </v-row>
         </validation-observer>
@@ -237,18 +259,28 @@
       BackgroundCard
     },
     mounted() {
-      apiGetUploadForm()
+      if(this.$store.getters.user == null || this.$cookie.get("user") == null){
+          this.$router.push({
+              name: 'signin'
+              })
+      }else{
+        this.userId = this.$store.getters.user.userId;
+        apiGetUploadForm()
         .then(res => {
           this.healthIssue = res.data.healthCondition;
           this.breedCat = res.data.breed.cat;
           this.breedDog = res.data.breed.dog;
         })
         .catch(err => {
-          console.log(err);
-        });    
+          console.log("err:"+err.response.data.error);
+          this.errorMessage = err.response.data.error;
+          this.show = true;
+        });  
+      }  
     },
     data: () => ({
       name: null,
+      userId: null,
       selectedFormType: null,
       picture: null,
       selectedType: null,
@@ -264,15 +296,19 @@
       menu: false,
       sizes: ["small","meduim","large"],
       colors: ["white","black","brown","orange","grey"],
+      selectHealth: null,
       checkbox: null,
+      status: "pending",
+      show: false
     }),
 
     methods: {
       submit () {
         this.$refs.observer.validate()
+        this.status = "processing";
         let formData = new FormData();
         formData.append("picture", this.picture, this.picture.name);
-        formData.set("userId", 1);
+        formData.set("userId", this.userId);
         formData.set("status", this.selectedFormType);
         formData.set("date", this.date);
         formData.set("name", this.name);
@@ -284,25 +320,27 @@
         formData.set("gender", this.selectGender);
         formData.set("chip_status", this.checkbox);
         formData.set("health_issue", this.selectHealth);
-        formData.set("zip_code", this.zipcode);
-        console.log(this.selectedBreed);
-        return apiUploadPet(formData);
-      },
-      clear () {
-        this.name = ''
-        this.zipcode = ''
-        this.age = ''
-        this.select = null
-        this.checkbox = null
-        this.selectedType = null
-        this.selectedBreed = null
-        this.cat = false
-        this.dog = true
-        this.$refs.observer.reset()
+        formData.set("zip_code", this.zip_code);
+        apiUploadPet(formData)
+        .then(res => {
+          if(res.status == 200){
+            this.status = "success";
+            setTimeout(() => {
+              this.$router.push({
+                  name: 'MainPage'
+                  //params: { courseId: this.courseId, labId: res.data.labId }
+                })
+            }, 1000);
+          }
+        }).catch(err => {
+          this.show = true;
+          this.status = "pending";
+          console.log(err);
+        });
       },
       goBack() {
         this.$router.go(-1);
-      },
+      }  
     },
   }
 </script>

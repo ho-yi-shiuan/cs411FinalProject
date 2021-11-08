@@ -1,4 +1,4 @@
-const zipcode = `
+const zip_code = `
     SELECT * FROM ZIPCODE;
 `
 
@@ -11,7 +11,7 @@ const healthIssue = `
 `
 
 module.exports = {
-    zipcode,
+    zip_code,
     healthIssue,
     getBreed
 }

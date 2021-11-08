@@ -38,7 +38,8 @@
 import {
   mdiAccount,
   mdiPlusCircleOutline ,
-  mdiHome
+  mdiHome,
+  mdiTable_chart
 } from '@mdi/js'
 
 export default {
@@ -52,6 +53,7 @@ export default {
       icons: [
         {icon: mdiHome, path: '/'},
         {icon: mdiPlusCircleOutline, path: '/upload'},
+        {icon: mdiTable_chart, path: '/data'},
         {icon: mdiAccount, path: '/profile'}
       ]
     }),

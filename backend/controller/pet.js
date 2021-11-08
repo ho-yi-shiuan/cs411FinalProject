@@ -1,5 +1,5 @@
 const express = require("express");
-const {getPetList, InsertPet, SearchPet} = require("../model/pet");
+const {getPetList, InsertPet, SearchPet, deletePet, updatePet,showCountOfLostAfter2019,showCatCommonHealthIssue} = require("../model/pet");
 const petController = express.Router();
 const app = express();
 const fs = require('fs');
@@ -27,7 +27,7 @@ var upload = multer({
 //get all pet list for main page
 petController.get("/allPets", async (req, res) => {
     const results = await getPetList();
-    res.status(200).json(results.data);
+    res.status(200).json(results);
 });
 
 //upload form content for new pet
@@ -37,12 +37,35 @@ petController.post("/",upload.single('picture'), async (req, res) => {
   res.status(200).json(result.data);
 });
 
-//upload form content for new pet
+//search pet
 petController.post("/search", async (req, res) => {
   const pet = req.body;
-  console.log(pet);
-  const result = await SearchPet(pet.status, pet.dateStart, pet.dateEnd, pet.breed, pet.category, pet.color, pet.size, pet.gender, pet.checkbox, pet.health_issue, pet.zipcode)
+  const result = await SearchPet(pet.status, pet.dateStart, pet.dateEnd, pet.breed, pet.category, pet.color, pet.size, pet.gender, pet.checkbox, pet.health_issue, pet.zip_code)
   res.status(200).json(result.data);
+});
+
+//delete pet
+petController.post("/delete", async (req, res) => {
+  const result = await deletePet(req.body.pet_id);
+  res.status(result.code || 200).json(result.data);
+});
+
+//update pet
+petController.post("/update", async (req, res) => {
+  const result = await updatePet(req.body.data);
+  res.status(result.code || 200).json(result.data);
+});
+
+//show count Of lost pet after 2019
+petController.get("/showCountOfLostAfter2019", async (req, res) => {
+  const result = await showCountOfLostAfter2019(req.body.data);
+  res.status(result.code || 200).json(result.data);
+});
+
+//show cats' common health issue
+petController.get("/showCatCommonHealthIssue", async (req, res) => {
+  const result = await showCatCommonHealthIssue(req.body.data);
+  res.status(result.code || 200).json(result.data);
 });
 
 module.exports = petController;

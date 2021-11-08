@@ -1,9 +1,15 @@
 const getUserProfile = `
-    SELECT u.*, p.*, l.*
+    SELECT u.user_id, u.email, u.first_name, u.last_name, u.phone, u.zip_code, u.access_token, u.access_expired, l.city, l.state
     FROM USER u
-    LEFT JOIN PET p ON p.contact = u.user_id
-    LEFT JOIN ZIPCODE l ON l.zipCode = u.zip_code
+    JOIN ZIPCODE l ON l.zip_code = u.zip_code
     WHERE access_token = ?;
+`
+
+const getUserPet = `
+    SELECT p.*, l.* 
+    FROM PET p
+    JOIN ZIPCODE l ON l.zip_code = p.zip_code
+    WHERE p.contact = ?
 `
 
 const checkUserExist = `
@@ -22,6 +28,7 @@ const updateToken = `
 
 module.exports = {
     getUserProfile,
+    getUserPet,
     checkUserExist,
     insertUser,
     updateToken

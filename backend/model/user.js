@@ -3,6 +3,7 @@ const userQuery = require("../query/user");
 let SqlString = require('sqlstring');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const date = require('date-and-time');
 
 const getUserProfile = async(userToken) => {
     return new Promise(async function(resolve, reject) {
@@ -11,53 +12,62 @@ const getUserProfile = async(userToken) => {
         try{
 			const now = Date.now();
             //search for user data, location, all pet own by user with token
-            const user = await connection.execute(userQuery.getUserProfile,[userToken]);
-            if(user[0].length == 0){
+            const user = await connection.query(userQuery.getUserProfile,[userToken]);
+            if(user[0][0].length == 0){
                 //if no result, return token wrong, redirect to signin page
-                await connection.commit(); 
-                resolve({
-                code: 200,
-                data: {UserProfile: "tokenWrong"}
-                })	
+                let err = new Error('token incorrect');
+                err.statusCode = 401;
+                throw err;
             }else if(now >= user[0][0].access_expired){
                 //else if result exist but token expired
-                await connection.commit();
-                resolve({
-                code: 200,
-                data: {UserProfile: "tokenExpired"}
-                })
+                let err = new Error('token expired');
+                err.statusCode = 401;
+                throw err;
             }
-            //else, return result
-            //think how to get user info with location and pet list with location in one query
-            // let userInformation = {
-            //     email: user[0][0].email,
-            //     name: user[0][0].firstName+ " " +user[0][0].lastName,
-            //     phone: user[0][0].phone,
-            //     zip_code: user[0][0].zip_code,
-            //     userID: user[0][0].user_id,
-            //     access_token: user[0][0].access_token,
-            //     access_expired: user[0][0].access_expired,
-            //     zipCode: user[0][0].,
-            //     city: user[0][0].,
-            //     state: user[0][0].,
-            //     latitude: user[0][0].,
-            //     longitude: user[0][0].                           
-            // }
-            //let userPetList = []
+            //else, return result with pet record own by user
+            const userPetList = await connection.query(userQuery.getUserPet,[user[0][0].user_id]);
+            for(i=0;i<userPetList[0].length;i++){
+                userPetList[0][i].date = date.format(userPetList[0][i].date, "YYYY/MM/DD");
+            }
+            let userInformation = {
+                email: user[0][0].email,
+                name: user[0][0].first_name+ " " +user[0][0].last_name,
+                phone: user[0][0].phone,
+                zip_code: user[0][0].zip_code,
+                userID: user[0][0].user_id,
+                access_token: user[0][0].access_token,
+                access_expired: user[0][0].access_expired,
+                city: user[0][0].city,
+                state: user[0][0].state,
+                latitude: user[0][0].latitude,
+                longitude: user[0][0].longitude,
+                pet:userPetList[0]
+            }
             await connection.commit(); 
             resolve({
               code: 200,
-              data: {UserProfile: user[0]}
+              data: {UserProfile: userInformation}
             })
         }catch(err){
-            console.log("error in signin:");
+            await connection.rollback();
+            if (err.statusCode == 401){
+                reject ({
+                    code: 401,
+                    data: {error:err.message}
+                })
+            }
             console.log(err);
-            await connection.rollback(function(){
-                connection.release();
-                res.status(500).send({error:"db query error in get user profile"});
+            reject ({
+                code: 500,
+                data: {error:"server error in get user profile"}
             })
+        }finally {
+            connection.release();
         }
-    });
+    }).catch(err =>{
+        console.log("error in get user profile: "+err.data.error);
+        return err;
+    })
 }
 
 const signup = (user) => {
@@ -69,11 +79,10 @@ const signup = (user) => {
             const userList = await connection.execute(userQuery.checkUserExist,[user.email]);
             if(userList[0].length > 0){
                 //if exist, show message to tell user switch to login page
-                await connection.commit(); 
-                resolve({
-                  code: 200,
-                  data: {signupStatus: "exist"}
-                })
+                await connection.commit();
+                let err = new Error('user exist');
+                err.statusCode = 409;
+                throw err;
             }
             //if not exist, start to signup
             //create token
@@ -104,21 +113,31 @@ const signup = (user) => {
             }
             await connection.commit(); 
             resolve({
-              code: 200,
-              data: {
-                        signupStatus: "success",
+                code: 200,
+                data: {
                         user: user_data
                     }
             })
         }catch(err){
-            console.log("error in signup:");
             console.log(err);
-            await connection.rollback(function(){
-                connection.release();
-                res.status(500).send({error:"db query error in signup"});
+            await connection.rollback();
+            if (err.statusCode == 409){
+                reject ({
+                    code: 409,
+                    data: {error:err.message}
+                })
+            }
+            reject ({
+                code: 500,
+                data: {error:"server error in signup"}
             })
+        }finally {
+            connection.release();
         }
-  });
+    }).catch(err =>{
+        console.log("error in signup: "+err.data.error);
+        return err;
+    })
 }
 
 const signin = (user) => {
@@ -130,11 +149,9 @@ const signin = (user) => {
             const userList = await connection.execute(userQuery.checkUserExist,[user.email]);
             if(userList[0].length == 0){
                 //if no, return no user
-                await connection.commit(); 
-                resolve({
-                code: 200,
-                data: {signupStatus: "unknownAccount"}
-                })
+                let err = new Error('Email incorrect');
+                err.statusCode = 401;
+                throw err;
             }
             //if yes, check if password is correct
             const comparePassword = await bcrypt.compare(user.password, userList[0][0].password);
@@ -157,13 +174,14 @@ const signin = (user) => {
                         console.log("error in updateUserToken function");
                         console.log(err);
                         connection.release();
-                        res.status(401).send({error:"Update user token Error"});
+                        let err = new Error('Update user token Error');
+                        throw err;
                     });            
                 }
                 //return updated user info and new token
                 let user_data = {
                     email: userList[0][0].email,
-                    name: userList[0][0].firstName+ " " +userList[0].lastName,
+                    name: userList[0][0].first_name+ " " +userList[0][0].last_name,
                     phone: userList[0][0].phone,
                     zip_code: userList[0][0].zip_code,
                     user_id: userList[0][0].user_id,
@@ -172,29 +190,37 @@ const signin = (user) => {
                 }
                 await connection.commit(); 
                 resolve({
-                  code: 200,
-                  data: {
-                            signupStatus: "success",
+                    code: 200,
+                    data: {
                             user: user_data
                         }
-                })            
+                })
             }else{
                 //password incorrect, rollback
-                await connection.commit(); 
-                resolve({
-                code: 200,
-                data: {signupStatus: "passwordIncorrect"}
-                })
+                let err = new Error('Password incorrect');
+                err.statusCode = 401;
+                throw err;
             }
         }catch(err){
-            console.log("error in signin:");
-            console.log(err);
-            await connection.rollback(function(){
-                connection.release();
-                res.status(500).send({error:"db query error in signin"});
+            await connection.rollback();
+            if (err.statusCode == 401){
+                reject ({
+                    code: 401,
+                    data: {error:err.message}
+                })
+                //res.status(401).send({ error: err.message });
+            }
+            reject ({
+                code: 500,
+                data: {error:"server error in signin"}
             })
+        }finally {
+            connection.release();
         }
-    });
+    }).catch(err =>{
+        console.log("error in signin: "+err.data.error);
+        return err;
+    })
 }
 
 module.exports = {

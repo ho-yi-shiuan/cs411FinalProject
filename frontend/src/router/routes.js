@@ -1,6 +1,9 @@
 import MainPage from '../components/mainpage/MainPage.vue'
 import upload from '../components/upload/upload.vue'
 import UserProfilePage from '../components/userProfile/ProfilePage.vue'
+import signin from '../components/userProfile/signin.vue'
+import signup from '../components/userProfile/signup.vue'
+import data from '../components/data/data.vue'
 
 const router = [
   {
@@ -17,6 +20,21 @@ const router = [
     path: '/profile',
     name: 'UserProfilePage',
     component: UserProfilePage
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: signup
+  },
+  {
+    path: '/signin',
+    name: 'signin',
+    component: signin
+  },
+  {
+    path: '/data',
+    name: 'data',
+    component: data
   },
 ]
 

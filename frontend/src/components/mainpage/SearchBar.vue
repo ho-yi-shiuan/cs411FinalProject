@@ -2,7 +2,7 @@
     <v-card color="grey lighten-4" flat tile>
         <v-form @submit.prevent="submit" ref="form">
             <v-toolbar dense style="padding: 0px 10px 0px 20px;">
-                <v-text-field v-model="zipcode" color="lime darken-3" label="Search by zipcode" hide-details single-line></v-text-field>
+                <v-text-field v-model="zip_code" color="lime darken-3" label="Search by zip_code" hide-details single-line></v-text-field>
                 <v-btn type="submit" icon>
                     <v-icon>mdi-magnify</v-icon>
                 </v-btn>
@@ -207,7 +207,7 @@
         },
         data: () => ({
             show: false,
-            zipcode: null,
+            zip_code: null,
             selectedFormType: null,
             FormType:["lost","found"],
             selectedType: null,
@@ -234,7 +234,7 @@
         methods:{
             submit (){
                 let searchContent = {
-                    "zipcode": this.zipcode,
+                    "zip_code": this.zip_code,
                     "status": this.selectedFormType,
                     "dateStart": this.dateStart,
                     "dateEnd": this.dateEnd,
@@ -247,12 +247,17 @@
                     "checkbox": this.checkbox
                 }
                 apiSearchPet(searchContent)
-                    .then(res => {
-                    this.$emit("search" ,res.data);
-                    })
-                    .catch(err => {
-                    console.log(err);
-                    });  
+                .then(res => {
+                    if(res.status == 200){
+                        this.$emit("search" ,res.data);
+                        this.show = false;
+                    }
+                })
+                .catch(err => {
+                    console.log("err");
+                    this.$emit("searchBarErr", err);
+                    this.show = false;
+                });  
             }
         }
     }

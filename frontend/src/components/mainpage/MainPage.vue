@@ -1,11 +1,22 @@
 <template>
   <BackgroundCard>
-    <SearchBar v-on:search="ShowSearchResult" style="width: 100%;"/>
+    <SearchBar v-on:search="ShowSearchResult" v-on:searchBarErr="SearchErr" style="width: 100%;"/>
     <v-container style="padding:0px 12px;">
+      <v-row style="margin-top:10px;">
+        <v-alert
+          v-show="show"
+          dense
+          border="left"
+          type="warning"
+          style="margin-top:10px; width:100%;"
+        >
+          Error in showing data, please try later
+        </v-alert>
+      </v-row>   
       <v-row dense class="d-flex flex-row justify-space-between">
         <v-card
             v-for="item in items"
-            :key=item.petID
+            :key=item.pet_id
             cols="12"
             class="MainPageCard"
         >
@@ -50,21 +61,34 @@ export default {
     },
     data() {
       return {
-        items:[]
+        items:[],
+        show: false,
+        
       }
     },
     mounted() {
       apiGetPet()
         .then(res => {
-          this.items = res.data;
+          if(res.status == 200){
+            this.items = res.data.data;
+          }
         })
         .catch(err => {
-          console.log(err);
-        });    
+            this.show = true;
+            console.log(err);
+        });
     },
     methods: {
       ShowSearchResult: function ShowSearchResult(pet){
         this.items = pet;
+      },
+      SearchErr: function SearchErr(err){
+        this.items = [];
+        this.show = true;
+        console.log(err);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     }
 }

@@ -4,8 +4,8 @@ const uploadPetController = express.Router();
 
 //get all filter needed for upload page
 uploadPetController.get("/", async (req, res) => {
-    const FormData = await getFormData();
-    res.status(200).json(FormData);
+    const result = await getFormData();
+    res.status(result.code || 200).json(result.data);
 });
 
 module.exports = uploadPetController;
